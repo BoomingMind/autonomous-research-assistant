@@ -14,7 +14,17 @@ flowchart TB
 
     DR[Deep Research] -->
     SQ[SERP Queries] -->
-    PR[Process Results] -->
+    PR[Process Results]
+
+    subgraph Results[Results]
+        direction TB
+        NL((Learnings))
+        ND((Directions))
+    end
+
+    PR --> NL
+    PR --> ND
+
     DP{depth > 0?}
 
     RD["Next Direction:
@@ -26,6 +36,9 @@ flowchart TB
 
     %% Main Flow
     Q & B & D --> DR
+
+    %% Results to Decision
+    NL & ND --> DP
 
     %% Circular Flow
     DP -->|Yes| RD
@@ -39,11 +52,13 @@ flowchart TB
     classDef process fill:#70a1ff,stroke:#1e90ff,color:black
     classDef recursive fill:#ffa502,stroke:#ff7f50,color:black
     classDef output fill:#ff4757,stroke:#ff6b81,color:black
+    classDef results fill:#a8e6cf,stroke:#3b7a57,color:black
 
     class Q,B,D input
     class DR,SQ,PR process
     class DP,RD recursive
     class MR output
+    class NL,ND results
 ```
 
 ## Features
