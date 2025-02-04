@@ -80,6 +80,7 @@ async function processSerpResult({
 
   const res = await generateObject({
     model: o3MiniModel,
+    abortSignal: AbortSignal.timeout(60_000),
     system: systemPrompt(),
     prompt: `Given the following contents from a SERP search for the query <query>${query}</query>, generate a list of learnings from the contents. Return a maximum of ${numLearnings} learnings, but feel free to return less if the contents are clear. Make sure each learning is unique and not similar to each other. The learnings should be concise and to the point, as infromation dense as possible. Make sure to include any entities like people, places, companies, products, things, etc in the learnings, as well as any exact metrics, numbers, or dates. The learnings will be used to research the topic further.\n\n<contents>${contents
       .map(content => `<content>\n${content}\n</content>`)
@@ -153,44 +154,53 @@ export async function deepResearch({
   const results = await Promise.all(
     serpQueries.map(serpQuery =>
       limit(async () => {
-        const result = await firecrawl.search(serpQuery.query, {
-          scrapeOptions: { formats: ['markdown'] },
-        });
+        try {
+          const result = await firecrawl.search(serpQuery.query, {
+            timeout: 15000,
+            scrapeOptions: { formats: ['markdown'] },
+          });
 
-        // Collect URLs from this search
-        const newUrls = compact(result.data.map(item => item.url));
-        const newBreadth = Math.ceil(breadth / 2);
-        const newDepth = depth - 1;
+          // Collect URLs from this search
+          const newUrls = compact(result.data.map(item => item.url));
+          const newBreadth = Math.ceil(breadth / 2);
+          const newDepth = depth - 1;
 
-        const newLearnings = await processSerpResult({
-          query: serpQuery.query,
-          result,
-          numFollowUpQuestions: newBreadth,
-        });
-        const allLearnings = [...learnings, ...newLearnings.learnings];
-        const allUrls = [...visitedUrls, ...newUrls];
+          const newLearnings = await processSerpResult({
+            query: serpQuery.query,
+            result,
+            numFollowUpQuestions: newBreadth,
+          });
+          const allLearnings = [...learnings, ...newLearnings.learnings];
+          const allUrls = [...visitedUrls, ...newUrls];
 
-        if (newDepth > 0) {
-          console.log(
-            `Researching deeper, breadth: ${newBreadth}, depth: ${newDepth}`,
-          );
+          if (newDepth > 0) {
+            console.log(
+              `Researching deeper, breadth: ${newBreadth}, depth: ${newDepth}`,
+            );
 
-          const nextQuery = `
+            const nextQuery = `
             Previous research goal: ${serpQuery.researchGoal}
             Follow-up research directions: ${newLearnings.followUpQuestions.map(q => `\n${q}`).join('')}
           `.trim();
 
-          return deepResearch({
-            query: nextQuery,
-            breadth: newBreadth,
-            depth: newDepth,
-            learnings: allLearnings,
-            visitedUrls: allUrls,
-          });
-        } else {
+            return deepResearch({
+              query: nextQuery,
+              breadth: newBreadth,
+              depth: newDepth,
+              learnings: allLearnings,
+              visitedUrls: allUrls,
+            });
+          } else {
+            return {
+              learnings: allLearnings,
+              visitedUrls: allUrls,
+            };
+          }
+        } catch (e) {
+          console.error(`Error running query: ${serpQuery.query}: `, e);
           return {
-            learnings: allLearnings,
-            visitedUrls: allUrls,
+            learnings: [],
+            visitedUrls: [],
           };
         }
       }),
