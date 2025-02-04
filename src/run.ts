@@ -27,15 +27,15 @@ async function run() {
   const breadth =
     parseInt(
       await askQuestion(
-        'Enter research breadth (recommended 3-10, default 6): ',
+        'Enter research breadth (recommended 2-10, default 4): ',
       ),
       10,
-    ) || 6;
+    ) || 4;
   const depth =
     parseInt(
-      await askQuestion('Enter research depth (recommended 1-5, default 3): '),
+      await askQuestion('Enter research depth (recommended 1-5, default 2): '),
       10,
-    ) || 3;
+    ) || 2;
 
   console.log(`Creating research plan...`);
 
