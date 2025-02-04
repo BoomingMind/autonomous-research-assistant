@@ -4,7 +4,7 @@ import { compact } from 'lodash-es';
 import pLimit from 'p-limit';
 import { z } from 'zod';
 
-import { o3MiniModel } from './ai/providers';
+import { o3MiniModel, trimPrompt } from './ai/providers';
 import { systemPrompt } from './prompt';
 
 type ResearchResult = {
@@ -59,7 +59,10 @@ async function generateSerpQueries({
         .describe(`List of SERP queries, max of ${numQueries}`),
     }),
   });
-  console.log(`Created ${res.object.queries.length} queries`, res.object.queries);
+  console.log(
+    `Created ${res.object.queries.length} queries`,
+    res.object.queries,
+  );
 
   return res.object.queries.slice(0, numQueries);
 }
@@ -75,7 +78,9 @@ async function processSerpResult({
   numLearnings?: number;
   numFollowUpQuestions?: number;
 }) {
-  const contents = compact(result.data.map(item => item.markdown));
+  const contents = compact(result.data.map(item => item.markdown)).map(
+    content => trimPrompt(content, 25_000),
+  );
   console.log(`Ran ${query}, found ${contents.length} contents`);
 
   const res = await generateObject({
@@ -86,7 +91,9 @@ async function processSerpResult({
       .map(content => `<content>\n${content}\n</content>`)
       .join('\n')}</contents>`,
     schema: z.object({
-      learnings: z.array(z.string()).describe(`List of learnings, max of ${numLearnings}`),
+      learnings: z
+        .array(z.string())
+        .describe(`List of learnings, max of ${numLearnings}`),
       followUpQuestions: z
         .array(z.string())
         .describe(
@@ -94,7 +101,10 @@ async function processSerpResult({
         ),
     }),
   });
-  console.log(`Created ${res.object.learnings.length} learnings`, res.object.learnings);
+  console.log(
+    `Created ${res.object.learnings.length} learnings`,
+    res.object.learnings,
+  );
 
   return res.object;
 }
@@ -108,14 +118,21 @@ export async function writeFinalReport({
   learnings: string[];
   visitedUrls: string[];
 }) {
+  const learningsString = trimPrompt(
+    learnings
+      .map(learning => `<learning>\n${learning}\n</learning>`)
+      .join('\n'),
+    150_000,
+  );
+
   const res = await generateObject({
     model: o3MiniModel,
     system: systemPrompt(),
-    prompt: `Given the following prompt from the user, write a final report on the topic using the learnings from research:\n\n<prompt>${prompt}</prompt>\n\nHere are all the learnings from previous research:\n\n<learnings>${learnings
-      .map(learning => `<learning>\n${learning}\n</learning>`)
-      .join('\n')}</learnings>`,
+    prompt: `Given the following prompt from the user, write a final report on the topic using the learnings from research:\n\n<prompt>${prompt}</prompt>\n\nHere are all the learnings from previous research:\n\n<learnings>\n${learningsString}\n</learnings>`,
     schema: z.object({
-      reportMarkdown: z.string().describe('Final report on the topic in Markdown'),
+      reportMarkdown: z
+        .string()
+        .describe('Final report on the topic in Markdown'),
     }),
   });
 
@@ -150,6 +167,7 @@ export async function deepResearch({
         try {
           const result = await firecrawl.search(serpQuery.query, {
             timeout: 15000,
+            limit: 5,
             scrapeOptions: { formats: ['markdown'] },
           });
 
@@ -167,7 +185,9 @@ export async function deepResearch({
           const allUrls = [...visitedUrls, ...newUrls];
 
           if (newDepth > 0) {
-            console.log(`Researching deeper, breadth: ${newBreadth}, depth: ${newDepth}`);
+            console.log(
+              `Researching deeper, breadth: ${newBreadth}, depth: ${newDepth}`,
+            );
 
             const nextQuery = `
             Previous research goal: ${serpQuery.researchGoal}
