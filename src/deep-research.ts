@@ -15,11 +15,11 @@ type ResearchResult = {
 // increase this if you have higher API rate limits
 const ConcurrencyLimit = 2;
 
-// Initialize Firecrawl with API key if available, otherwise use local
-const isLocal = !process.env.FIRECRAWL_KEY || process.env.FIRECRAWL_KEY === "your_firecrawl_key";
+// Initialize Firecrawl with optional API key and optional base url
+
 const firecrawl = new FirecrawlApp({
-  apiKey: isLocal ? 'local-development-token' : process.env.FIRECRAWL_KEY!,
-  apiUrl: isLocal ? (process.env.FIRECRAWL_BASE_URL || 'http://localhost:3002') : undefined
+  apiKey: process.env.FIRECRAWL_KEY ?? "",
+  apiUrl: process.env.FIRECRAWL_BASE_URL 
 });
 
 // Default options for API consistency
