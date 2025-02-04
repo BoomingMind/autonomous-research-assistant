@@ -197,7 +197,6 @@ export async function deepResearch({
     ),
   );
 
-  // Simpler way to combine and deduplicate results
   return {
     learnings: [...new Set(results.flatMap(r => r.learnings))],
     visitedUrls: [...new Set(results.flatMap(r => r.visitedUrls))],
