@@ -76,7 +76,7 @@ async function processSerpResult({
   numFollowUpQuestions?: number;
 }) {
   const contents = compact(result.data.map(item => item.markdown));
-  console.log(`Ran ${query}, found ${contents.length} contents`, contents);
+  console.log(`Ran ${query}, found ${contents.length} contents`);
 
   const res = await generateObject({
     model: o3MiniModel,
