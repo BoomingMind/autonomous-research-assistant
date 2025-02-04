@@ -90,6 +90,9 @@ npm install
 
 ```bash
 FIRECRAWL_KEY="your_firecrawl_key"
+# If you want to use your self-hosted Firecrawl, add the following below:
+# FIRECRAWL_BASE_URL="http://localhost:3002"
+
 OPENAI_KEY="your_openai_key"
 ```
 

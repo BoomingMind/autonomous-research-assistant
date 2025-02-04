@@ -15,9 +15,28 @@ type ResearchResult = {
 // increase this if you have higher API rate limits
 const ConcurrencyLimit = 2;
 
+// Initialize Firecrawl with optional API key and optional base url
+
 const firecrawl = new FirecrawlApp({
-  apiKey: process.env.FIRECRAWL_KEY!,
+  apiKey: process.env.FIRECRAWL_KEY ?? "",
+  apiUrl: process.env.FIRECRAWL_BASE_URL 
 });
+
+// Default options for API consistency
+const defaultOptions = {
+  search: {
+    timeout: 15000,
+    scrapeOptions: { formats: ['markdown'] }
+  },
+  extract: {
+    timeout: 60000,
+    waitForResults: true
+  },
+  scrape: {
+    timeout: 30000,
+    format: 'markdown'
+  }
+};
 
 // take in user query, return a list of SERP queries
 async function generateSerpQueries({
@@ -156,6 +175,7 @@ export async function deepResearch({
       limit(async () => {
         try {
           const result = await firecrawl.search(serpQuery.query, {
+            ...defaultOptions.search,
             timeout: 15000,
             scrapeOptions: { formats: ['markdown'] },
           });
