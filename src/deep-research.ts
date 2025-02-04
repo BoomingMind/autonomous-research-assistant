@@ -18,27 +18,11 @@ const ConcurrencyLimit = 2;
 // Initialize Firecrawl with optional API key and optional base url
 
 const firecrawl = new FirecrawlApp({
-  apiKey: process.env.FIRECRAWL_KEY ?? "",
-  apiUrl: process.env.FIRECRAWL_BASE_URL 
+  apiKey: process.env.FIRECRAWL_KEY ?? '',
+  apiUrl: process.env.FIRECRAWL_BASE_URL,
 });
 
-// Default options for API consistency
-const defaultOptions = {
-  search: {
-    timeout: 15000,
-    scrapeOptions: { formats: ['markdown'] }
-  },
-  extract: {
-    timeout: 60000,
-    waitForResults: true
-  },
-  scrape: {
-    timeout: 30000,
-    format: 'markdown'
-  }
-};
-
-// take in user query, return a list of SERP queries
+// take en user query, return a list of SERP queries
 async function generateSerpQueries({
   query,
   numQueries = 3,
@@ -75,10 +59,7 @@ async function generateSerpQueries({
         .describe(`List of SERP queries, max of ${numQueries}`),
     }),
   });
-  console.log(
-    `Created ${res.object.queries.length} queries`,
-    res.object.queries,
-  );
+  console.log(`Created ${res.object.queries.length} queries`, res.object.queries);
 
   return res.object.queries.slice(0, numQueries);
 }
@@ -105,9 +86,7 @@ async function processSerpResult({
       .map(content => `<content>\n${content}\n</content>`)
       .join('\n')}</contents>`,
     schema: z.object({
-      learnings: z
-        .array(z.string())
-        .describe(`List of learnings, max of ${numLearnings}`),
+      learnings: z.array(z.string()).describe(`List of learnings, max of ${numLearnings}`),
       followUpQuestions: z
         .array(z.string())
         .describe(
@@ -115,10 +94,7 @@ async function processSerpResult({
         ),
     }),
   });
-  console.log(
-    `Created ${res.object.learnings.length} learnings`,
-    res.object.learnings,
-  );
+  console.log(`Created ${res.object.learnings.length} learnings`, res.object.learnings);
 
   return res.object;
 }
@@ -139,9 +115,7 @@ export async function writeFinalReport({
       .map(learning => `<learning>\n${learning}\n</learning>`)
       .join('\n')}</learnings>`,
     schema: z.object({
-      reportMarkdown: z
-        .string()
-        .describe('Final report on the topic in Markdown'),
+      reportMarkdown: z.string().describe('Final report on the topic in Markdown'),
     }),
   });
 
@@ -175,7 +149,6 @@ export async function deepResearch({
       limit(async () => {
         try {
           const result = await firecrawl.search(serpQuery.query, {
-            ...defaultOptions.search,
             timeout: 15000,
             scrapeOptions: { formats: ['markdown'] },
           });
@@ -194,9 +167,7 @@ export async function deepResearch({
           const allUrls = [...visitedUrls, ...newUrls];
 
           if (newDepth > 0) {
-            console.log(
-              `Researching deeper, breadth: ${newBreadth}, depth: ${newDepth}`,
-            );
+            console.log(`Researching deeper, breadth: ${newBreadth}, depth: ${newDepth}`);
 
             const nextQuery = `
             Previous research goal: ${serpQuery.researchGoal}
