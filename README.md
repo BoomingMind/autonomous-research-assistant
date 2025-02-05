@@ -2,6 +2,8 @@
 
 An AI-powered research assistant that performs iterative, deep research on any topic by combining search engines, web scraping, and large language models. If you like this project, please consider starring it and giving me a follow on [X](https://x.com/dzhng).
 
+The goal of this repo is to provide the simplest implementation of a deep research agent - e.g. an agent that can refine its research direction overtime and deep dive into a topic. It'll always be kept at <500 LoC so it is easy to understand and build on top of.
+
 ## How It Works
 
 ```mermaid
