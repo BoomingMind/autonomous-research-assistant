@@ -44,7 +44,10 @@ const MinChunkSize = 140;
 const encoder = getEncoding('o200k_base');
 
 // trim prompt to maximum context size
-export function trimPrompt(prompt: string, contextSize = 120_000) {
+export function trimPrompt(
+  prompt: string,
+  contextSize = Number(process.env.CONTEXT_SIZE) || 128_000,
+) {
   if (!prompt) {
     return '';
   }
