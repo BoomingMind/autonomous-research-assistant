@@ -83,6 +83,8 @@ flowchart TB
 
 ## Setup
 
+### Node.js
+
 1. Clone the repository
 2. Install dependencies:
 
@@ -98,6 +100,17 @@ FIRECRAWL_KEY="your_firecrawl_key"
 # FIRECRAWL_BASE_URL="http://localhost:3002"
 
 OPENAI_KEY="your_openai_key"
+```
+
+### Docker
+
+1. Clone the repository
+2. Rename `.env.example` to `.env.local` and set your API keys
+
+3. Run the Docker image:
+
+```bash
+docker compose run --rm deep-research
 ```
 
 ## Usage
