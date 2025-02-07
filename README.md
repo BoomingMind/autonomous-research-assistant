@@ -143,6 +143,15 @@ If you have a paid version of Firecrawl or a local version, feel free to increas
 
 If you have a free version, you may sometime run into rate limit errors, you can reduce the limit (but it will run a lot slower).
 
+### Custom endpoints and models
+
+There are 2 other optional env vars that lets you tweak the endpoint (for other OpenAI compatible APIs like OpenRouter or Gemini) as well as the model string.
+
+```bash
+OPENAI_ENDPOINT="custom_endpoint"
+OPENAI_MODEL="custom_model"
+```
+
 ## How It Works
 
 1. **Initial Setup**
