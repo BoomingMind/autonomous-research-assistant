@@ -207,8 +207,15 @@ export async function deepResearch({
               visitedUrls: allUrls,
             };
           }
-        } catch (e) {
-          console.error(`Error running query: ${serpQuery.query}: `, e);
+        } catch (e: any) {
+          if (e.message && e.message.includes('Timeout')) {
+            console.error(
+              `Timeout error running query: ${serpQuery.query}: `,
+              e,
+            );
+          } else {
+            console.error(`Error running query: ${serpQuery.query}: `, e);
+          }
           return {
             learnings: [],
             visitedUrls: [],
