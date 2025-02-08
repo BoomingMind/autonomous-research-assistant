@@ -6,6 +6,7 @@
     "format": "prettier --write \"src/**/*.{ts,tsx}\"",
     "tsx": "tsx --env-file=.env.local",
     "start": "tsx --env-file=.env.local src/run.ts",
+    "docker": "tsx src/run.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
