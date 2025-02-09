@@ -13,20 +13,14 @@ const openai = createOpenAI({
   baseURL: process.env.OPENAI_ENDPOINT || 'https://api.openai.com/v1',
 } as CustomOpenAIProviderSettings);
 
-const isCustomEndpoint =
-  process.env.OPENAI_ENDPOINT &&
-  process.env.OPENAI_ENDPOINT !== 'https://api.openai.com/v1';
-const customModel = process.env.OPENAI_MODEL;
+const customModel = process.env.OPENAI_MODEL || 'o3-mini';
 
 // Models
 
-export const o3MiniModel = openai(
-  isCustomEndpoint && customModel ? customModel : 'o3-mini',
-  {
-    reasoningEffort: 'medium',
-    structuredOutputs: true,
-  },
-);
+export const o3MiniModel = openai(customModel, {
+  reasoningEffort: customModel.startsWith('o') ? 'medium' : undefined,
+  structuredOutputs: true,
+});
 
 const MinChunkSize = 140;
 const encoder = getEncoding('o200k_base');
