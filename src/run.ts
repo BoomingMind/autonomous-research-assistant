@@ -3,6 +3,14 @@ import * as readline from 'readline';
 
 import { deepResearch, writeFinalReport } from './deep-research';
 import { generateFeedback } from './feedback';
+import { OutputManager } from './output-manager';
+
+const output = new OutputManager();
+
+// Helper function for consistent logging
+function log(...args: any[]) {
+  output.log(...args);
+}
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -37,14 +45,14 @@ async function run() {
       10,
     ) || 2;
 
-  console.log(`Creating research plan...`);
+  log(`Creating research plan...`);
 
   // Generate follow-up questions
   const followUpQuestions = await generateFeedback({
     query: initialQuery,
   });
 
-  console.log(
+  log(
     '\nTo better understand your research needs, please answer these follow-up questions:',
   );
 
@@ -59,22 +67,27 @@ async function run() {
   const combinedQuery = `
 Initial Query: ${initialQuery}
 Follow-up Questions and Answers:
-${followUpQuestions.map((q, i) => `Q: ${q}\nA: ${answers[i]}`).join('\n')}
+${followUpQuestions.map((q: string, i: number) => `Q: ${q}\nA: ${answers[i]}`).join('\n')}
 `;
 
-  console.log('\nResearching your topic...');
+  log('\nResearching your topic...');
 
+  log('\nStarting research with progress tracking...\n');
+  
   const { learnings, visitedUrls } = await deepResearch({
     query: combinedQuery,
     breadth,
     depth,
+    onProgress: (progress) => {
+      output.updateProgress(progress);
+    },
   });
 
-  console.log(`\n\nLearnings:\n\n${learnings.join('\n')}`);
-  console.log(
+  log(`\n\nLearnings:\n\n${learnings.join('\n')}`);
+  log(
     `\n\nVisited URLs (${visitedUrls.length}):\n\n${visitedUrls.join('\n')}`,
   );
-  console.log('Writing final report...');
+  log('Writing final report...');
 
   const report = await writeFinalReport({
     prompt: combinedQuery,
