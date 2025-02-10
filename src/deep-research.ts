@@ -188,6 +188,7 @@ export async function deepResearch({
     Object.assign(progress, update);
     onProgress?.(progress);
   };
+
   const serpQueries = await generateSerpQueries({
     query,
     learnings,
