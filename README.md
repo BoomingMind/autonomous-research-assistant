@@ -128,8 +128,8 @@ npm start
 You'll be prompted to:
 
 1. Enter your research query
-2. Specify research breadth (recommended: 3-10, default: 6)
-3. Specify research depth (recommended: 1-5, default: 3)
+2. Specify research breadth (recommended: 3-10, default: 4)
+3. Specify research depth (recommended: 1-5, default: 2)
 4. Answer follow-up questions to refine the research direction
 
 The system will then:
