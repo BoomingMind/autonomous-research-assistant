@@ -2,7 +2,7 @@
 
 An AI-powered research assistant that performs iterative, deep research on any topic by combining search engines, web scraping, and large language models.
 
-The goal of this repo is to provide the simplest implementation of a deep research agent - e.g. an agent that can refine its research direction overtime and deep dive into a topic. Goal is to keep the repo size at <500 LoC so it is easy to understand and build on top of.
+The goal of this repo is to provide the simplest implementation of a deep research agent - e.g. an agent that can refine its research direction over time and deep dive into a topic. Goal is to keep the repo size at <500 LoC so it is easy to understand and build on top of.
 
 If you like this project, please consider starring it and giving me a follow on [X/Twitter](https://x.com/dzhng). This project is sponsored by [Aomni](https://aomni.com).
 
@@ -145,7 +145,7 @@ The final report will be saved as `output.md` in your working directory.
 
 If you have a paid version of Firecrawl or a local version, feel free to increase the `ConcurrencyLimit` in `deep-research.ts` so it runs a lot faster.
 
-If you have a free version, you may sometime run into rate limit errors, you can reduce the limit (but it will run a lot slower).
+If you have a free version, you may sometimes run into rate limit errors, you can reduce the limit (but it will run a lot slower).
 
 ### Custom endpoints and models
 
