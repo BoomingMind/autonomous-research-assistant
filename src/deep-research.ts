@@ -160,6 +160,37 @@ export async function writeFinalReport({
   return res.object.reportMarkdown + urlsSection;
 }
 
+export async function writeFinalAnswer({
+  prompt,
+  learnings,
+  report,
+}: {
+  prompt: string;
+  learnings: string[];
+  report: string;
+}) {
+  const res = await generateObject({
+    model: o3MiniModel,
+    system: systemPrompt(),
+    prompt: `Given the following prompt from the user, write a final answer on the topic using the learnings from research. Follow the format specified in the prompt. Do not yap or babble or include any other text than the answer besides the format specified in the prompt. Keep the answer as concise as possible - usually it should be just a few words or maximum a sentence. Try to follow the format specified in the prompt (for example, if the prompt is using Latex, the answer should be in Latex. If the prompt gives multiple answer choices, the answer should be one of the choices).
+    
+    <prompt>${prompt}</prompt>
+    
+    <report>${report}</report>
+    
+    <format>
+    <answer>
+    </answer>
+    </format>
+    `,
+    schema: z.object({
+      answer: z.string().describe('The final answer'),
+    }),
+  });
+
+  return res.object.answer;
+}
+
 export async function deepResearch({
   query,
   breadth,

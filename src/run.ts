@@ -1,7 +1,8 @@
 import * as fs from 'fs/promises';
 import * as readline from 'readline';
 
-import { deepResearch, writeFinalReport } from './deep-research';
+
+import { deepResearch, writeFinalAnswer, writeFinalReport } from './deep-research';
 import { generateFeedback } from './feedback';
 import { OutputManager } from './output-manager';
 
@@ -50,6 +51,7 @@ async function run() {
   // Generate follow-up questions
   const followUpQuestions = await generateFeedback({
     query: initialQuery,
+    numQuestions: 0
   });
 
   log(
@@ -101,6 +103,16 @@ ${followUpQuestions.map((q: string, i: number) => `Q: ${q}\nA: ${answers[i]}`).j
   console.log(`\n\nFinal Report:\n\n${report}`);
   console.log('\nReport has been saved to output.md');
   rl.close();
+
+  const answer = await writeFinalAnswer({
+    prompt: combinedQuery,
+    learnings,
+    report,
+  });
+
+  console.log(`\n\nFinal Answer:\n\n${answer}`);
+
+  await fs.writeFile('answer.md', answer, 'utf-8');
 }
 
 run().catch(console.error);
