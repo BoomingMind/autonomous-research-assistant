@@ -5,15 +5,10 @@ import pLimit from 'p-limit';
 import { z } from 'zod';
 
 import { getModel, trimPrompt } from './ai/providers';
-import { OutputManager } from './output-manager';
 import { systemPrompt } from './prompt';
 
-// Initialize output manager for coordinated console/progress output
-const output = new OutputManager();
-
-// Replace console.log with output.log
 function log(...args: any[]) {
-  output.log(...args);
+  console.log(...args);
 }
 
 export type ResearchProgress = {

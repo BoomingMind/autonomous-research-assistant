@@ -7,13 +7,10 @@ import {
   writeFinalReport,
 } from './deep-research';
 import { generateFeedback } from './feedback';
-import { OutputManager } from './output-manager';
-
-const output = new OutputManager();
 
 // Helper function for consistent logging
 function log(...args: any[]) {
-  output.log(...args);
+  console.log(...args);
 }
 
 const rl = readline.createInterface({
@@ -84,9 +81,6 @@ ${followUpQuestions.map((q: string, i: number) => `Q: ${q}\nA: ${answers[i]}`).j
     query: combinedQuery,
     breadth,
     depth,
-    onProgress: progress => {
-      output.updateProgress(progress);
-    },
   });
 
   log(`\n\nLearnings:\n\n${learnings.join('\n')}`);

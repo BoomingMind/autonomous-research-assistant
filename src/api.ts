@@ -2,8 +2,6 @@ import cors from 'cors';
 import express, { Request, Response } from 'express';
 
 import { deepResearch, writeFinalAnswer } from './deep-research';
-import { generateFeedback } from './feedback';
-import { OutputManager } from './output-manager';
 
 const app = express();
 const port = process.env.PORT || 3051;
@@ -12,12 +10,9 @@ const port = process.env.PORT || 3051;
 app.use(cors());
 app.use(express.json());
 
-// Initialize output manager
-const output = new OutputManager();
-
 // Helper function for consistent logging
 function log(...args: any[]) {
-  output.log(...args);
+  console.log(...args);
 }
 
 // API endpoint to run research
@@ -29,37 +24,23 @@ app.post('/api/research', async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Query is required' });
     }
 
-    log('\nResearching your topic...');
-    log('\nStarting research with progress tracking...\n');
+    log('\nStarting research...\n');
 
     const { learnings, visitedUrls } = await deepResearch({
       query,
       breadth,
       depth,
-      onProgress: progress => {
-        output.updateProgress(progress);
-      },
     });
 
     log(`\n\nLearnings:\n\n${learnings.join('\n')}`);
     log(
       `\n\nVisited URLs (${visitedUrls.length}):\n\n${visitedUrls.join('\n')}`,
     );
-    log('Writing final answer...');
-
-    // Save report to file with timestamp
-    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-    const reportFilename = `output-${timestamp}.md`;
-    // await fs.writeFile(reportFilename, report, 'utf-8');
 
     const answer = await writeFinalAnswer({
       prompt: query,
       learnings,
     });
-
-    // Save answer to file
-    const answerFilename = `answer-${timestamp}.md`;
-    // await fs.writeFile(answerFilename, answer, 'utf-8');
 
     // Return the results
     return res.json({
@@ -67,8 +48,6 @@ app.post('/api/research', async (req: Request, res: Response) => {
       answer,
       learnings,
       visitedUrls,
-      reportFilename,
-      answerFilename,
     });
   } catch (error: unknown) {
     console.error('Error in research API:', error);
