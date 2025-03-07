@@ -2,6 +2,8 @@
 
 # Output files
 output.md
+report.md
+answer.md
 
 # Dependencies
 node_modules

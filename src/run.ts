@@ -1,8 +1,11 @@
 import * as fs from 'fs/promises';
 import * as readline from 'readline';
 
-
-import { deepResearch, writeFinalAnswer, writeFinalReport } from './deep-research';
+import {
+  deepResearch,
+  writeFinalAnswer,
+  writeFinalReport,
+} from './deep-research';
 import { generateFeedback } from './feedback';
 import { OutputManager } from './output-manager';
 
@@ -45,13 +48,16 @@ async function run() {
       await askQuestion('Enter research depth (recommended 1-5, default 2): '),
       10,
     ) || 2;
+  const isReport =
+    (await askQuestion(
+      'Do you want to generate a long report or a specific answer? (report/answer)',
+    )) === 'report';
 
   log(`Creating research plan...`);
 
   // Generate follow-up questions
   const followUpQuestions = await generateFeedback({
     query: initialQuery,
-    numQuestions: 0
   });
 
   log(
@@ -72,47 +78,43 @@ Follow-up Questions and Answers:
 ${followUpQuestions.map((q: string, i: number) => `Q: ${q}\nA: ${answers[i]}`).join('\n')}
 `;
 
-  log('\nResearching your topic...');
+  log('\nStarting research...\n');
 
-  log('\nStarting research with progress tracking...\n');
-  
   const { learnings, visitedUrls } = await deepResearch({
     query: combinedQuery,
     breadth,
     depth,
-    onProgress: (progress) => {
+    onProgress: progress => {
       output.updateProgress(progress);
     },
   });
 
   log(`\n\nLearnings:\n\n${learnings.join('\n')}`);
-  log(
-    `\n\nVisited URLs (${visitedUrls.length}):\n\n${visitedUrls.join('\n')}`,
-  );
+  log(`\n\nVisited URLs (${visitedUrls.length}):\n\n${visitedUrls.join('\n')}`);
   log('Writing final report...');
 
-  const report = await writeFinalReport({
-    prompt: combinedQuery,
-    learnings,
-    visitedUrls,
-  });
+  if (isReport) {
+    const report = await writeFinalReport({
+      prompt: combinedQuery,
+      learnings,
+      visitedUrls,
+    });
 
-  // Save report to file
-  await fs.writeFile('output.md', report, 'utf-8');
+    await fs.writeFile('report.md', report, 'utf-8');
+    console.log(`\n\nFinal Report:\n\n${report}`);
+    console.log('\nReport has been saved to report.md');
+  } else {
+    const answer = await writeFinalAnswer({
+      prompt: combinedQuery,
+      learnings,
+    });
 
-  console.log(`\n\nFinal Report:\n\n${report}`);
-  console.log('\nReport has been saved to output.md');
+    await fs.writeFile('answer.md', answer, 'utf-8');
+    console.log(`\n\nFinal Answer:\n\n${answer}`);
+    console.log('\nAnswer has been saved to answer.md');
+  }
+
   rl.close();
-
-  const answer = await writeFinalAnswer({
-    prompt: combinedQuery,
-    learnings,
-    report,
-  });
-
-  console.log(`\n\nFinal Answer:\n\n${answer}`);
-
-  await fs.writeFile('answer.md', answer, 'utf-8');
 }
 
 run().catch(console.error);

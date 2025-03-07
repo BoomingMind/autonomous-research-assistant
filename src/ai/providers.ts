@@ -1,26 +1,49 @@
-import { createOpenAI, type OpenAIProviderSettings } from '@ai-sdk/openai';
+import { createFireworks } from '@ai-sdk/fireworks';
+import { createOpenAI } from '@ai-sdk/openai';
+import { LanguageModelV1 } from 'ai';
 import { getEncoding } from 'js-tiktoken';
 
 import { RecursiveCharacterTextSplitter } from './text-splitter';
 
-interface CustomOpenAIProviderSettings extends OpenAIProviderSettings {
-  baseURL?: string;
-}
-
 // Providers
-const openai = createOpenAI({
-  apiKey: process.env.OPENAI_KEY!,
-  baseURL: process.env.OPENAI_ENDPOINT || 'https://api.openai.com/v1',
-} as CustomOpenAIProviderSettings);
+const openai = process.env.OPENAI_KEY
+  ? createOpenAI({
+      apiKey: process.env.OPENAI_KEY,
+      baseURL: process.env.OPENAI_ENDPOINT || 'https://api.openai.com/v1',
+    })
+  : undefined;
 
-const customModel = process.env.OPENAI_MODEL || 'o3-mini';
+const fireworks = process.env.FIREWORKS_KEY
+  ? createFireworks({
+      apiKey: process.env.FIREWORKS_KEY,
+    })
+  : undefined;
+
+const customModel = process.env.CUSTOM_MODEL
+  ? openai?.(process.env.CUSTOM_MODEL)
+  : undefined;
 
 // Models
 
-export const o3MiniModel = openai(customModel, {
-  reasoningEffort: customModel.startsWith('o') ? 'medium' : undefined,
+const o3MiniModel = openai?.('o3-mini', {
+  reasoningEffort: 'medium',
   structuredOutputs: true,
 });
+
+const deepSeekR1Model = fireworks?.('accounts/fireworks/models/deepseek-r1');
+
+export function getModel(): LanguageModelV1 {
+  if (customModel) {
+    return customModel;
+  }
+
+  const model = deepSeekR1Model ?? o3MiniModel;
+  if (!model) {
+    throw new Error('No model found');
+  }
+
+  return model as LanguageModelV1;
+}
 
 const MinChunkSize = 140;
 const encoder = getEncoding('o200k_base');
