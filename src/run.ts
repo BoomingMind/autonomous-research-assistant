@@ -50,33 +50,36 @@ async function run() {
     ) || 2;
   const isReport =
     (await askQuestion(
-      'Do you want to generate a long report or a specific answer? (report/answer, default report)',
+      'Do you want to generate a long report or a specific answer? (report/answer, default report): ',
     )) === 'report';
 
-  log(`Creating research plan...`);
+  let combinedQuery = initialQuery;
+  if (isReport) {
+    log(`Creating research plan...`);
 
-  // Generate follow-up questions
-  const followUpQuestions = await generateFeedback({
-    query: initialQuery,
-  });
+    // Generate follow-up questions
+    const followUpQuestions = await generateFeedback({
+      query: initialQuery,
+    });
 
-  log(
-    '\nTo better understand your research needs, please answer these follow-up questions:',
-  );
+    log(
+      '\nTo better understand your research needs, please answer these follow-up questions:',
+    );
 
-  // Collect answers to follow-up questions
-  const answers: string[] = [];
-  for (const question of followUpQuestions) {
-    const answer = await askQuestion(`\n${question}\nYour answer: `);
-    answers.push(answer);
-  }
+    // Collect answers to follow-up questions
+    const answers: string[] = [];
+    for (const question of followUpQuestions) {
+      const answer = await askQuestion(`\n${question}\nYour answer: `);
+      answers.push(answer);
+    }
 
-  // Combine all information for deep research
-  const combinedQuery = `
+    // Combine all information for deep research
+    combinedQuery = `
 Initial Query: ${initialQuery}
 Follow-up Questions and Answers:
 ${followUpQuestions.map((q: string, i: number) => `Q: ${q}\nA: ${answers[i]}`).join('\n')}
 `;
+  }
 
   log('\nStarting research...\n');
 
