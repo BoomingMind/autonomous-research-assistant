@@ -1,6 +1,7 @@
 import * as fs from 'fs/promises';
 import * as readline from 'readline';
 
+import { getModel } from './ai/providers';
 import {
   deepResearch,
   writeFinalAnswer,
@@ -29,6 +30,8 @@ function askQuestion(query: string): Promise<string> {
 
 // run the agent
 async function run() {
+  console.log('Using model: ', getModel().modelId);
+
   // Get initial query
   const initialQuery = await askQuestion('What would you like to research? ');
 
@@ -47,7 +50,7 @@ async function run() {
     ) || 2;
   const isReport =
     (await askQuestion(
-      'Do you want to generate a long report or a specific answer? (report/answer)',
+      'Do you want to generate a long report or a specific answer? (report/answer, default report)',
     )) === 'report';
 
   log(`Creating research plan...`);
