@@ -48,10 +48,11 @@ async function run() {
       await askQuestion('Enter research depth (recommended 1-5, default 2): '),
       10,
     ) || 2;
+  const reportAnswer = await askQuestion(
+    'Do you want to generate a long report or a specific answer? (report/answer, default report): ',
+  );
   const isReport =
-    (await askQuestion(
-      'Do you want to generate a long report or a specific answer? (report/answer, default report): ',
-    )) === 'report';
+    reportAnswer === '' || reportAnswer.toLowerCase() === 'report';
 
   let combinedQuery = initialQuery;
   if (isReport) {
