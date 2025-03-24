@@ -152,9 +152,9 @@ The final report will be saved as `report.md` or `answer.md` in your working dir
 
 ### Concurrency
 
-If you have a paid version of Firecrawl or a local version, feel free to increase the `ConcurrencyLimit` in `deep-research.ts` so it runs a lot faster.
+If you have a paid version of Firecrawl or a local version, feel free to increase the `ConcurrencyLimit` by setting the `CONCURRENCY_LIMIT` environment variable so it runs faster.
 
-If you have a free version, you may sometimes run into rate limit errors, you can reduce the limit (but it will run a lot slower).
+If you have a free version, you may sometimes run into rate limit errors, you can reduce the limit to 1 (but it will run a lot slower).
 
 ### DeepSeek R1
 
