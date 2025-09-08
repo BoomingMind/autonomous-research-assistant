@@ -198,6 +198,10 @@ CUSTOM_MODEL="custom_model"
    - Compiles all findings into a comprehensive markdown report
    - Includes all sources and references
    - Organizes information in a clear, readable format
+  
+## Community implementations
+
+**Python**: https://github.com/Finance-LLMs/deep-research-python
 
 ## License
 
